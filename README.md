@@ -5,13 +5,19 @@ AutoClicker Icon
 A customizable auto-clicker with smart randomization to mimic human-like clicking behavior. Perfect for minecraftpvp, while avoiding detection!
 
 ✨ Features
+
 ✅ Human-like Randomization – Dynamic delays between clicks to avoid bot detection.
+
 ✅ Customizable Hotkeys – Start/Stop with your preferred keys.(Toggle && Hold mode)
+
 ✅ Adjustable Click Speed – Set clicks per second (CPS) within a range.
+
 ✅ Left/Right Click Support – Simulate both mouse buttons.
+
 ✅ Lightweight & Fast – Minimal CPU usage.
 
 📦 Installation
+
 1.Download the latest release from Releases.
 
 2.Run AutoClicker.exe .
@@ -19,6 +25,7 @@ A customizable auto-clicker with smart randomization to mimic human-like clickin
 3.Configure your settings and enjoy!
 
 ⚙️ Configuration
+
 {"MiddleMouse", VK_MBUTTON},{"Leftclick",VK_LBUTTON},{"Rightclick",VK_RBUTTON},
     {"MARCO2", VK_XBUTTON1},// backward button
     {"MARCO1", VK_XBUTTON2},// forward button
@@ -31,8 +38,13 @@ A customizable auto-clicker with smart randomization to mimic human-like clickin
     {"0", '0'}, {"1", '1'}, {"2", '2'}, {"3", '3'}, {"4", '4'}, {"5", '5'},
     {"6", '6'}, {"7", '7'}, {"8", '8'}, {"9", '9'},
     {"SPACE", VK_SPACE}, {"ENTER", VK_RETURN}
+    
 📜 License
+
 MIT License – Free for personal and commercial use.
+
 **NOTE**
+
 If you want your cps correct, just subtract 5-6 cps in the gui/setting.  
+
 For example: 22 cps in config but 16-17 cps in game.
