@@ -6,7 +6,7 @@
 
 //keybind handle
 std::unordered_map<std::string, int> keyCode = {
-    {"LEFTMOUSE",VK_LBUTTON},
+    {"LEFTMOUSE",VK_LBUTTON},{"LEFTCLICK",VK_LBUTTON},{"RIGHTCLICK",VK_RBUTTON},
 	{"MIDLEMOUSE", VK_MBUTTON},
 	{"MARCO2", VK_XBUTTON1},
 	{"MARCO1", VK_XBUTTON2},
