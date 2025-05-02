@@ -21,6 +21,7 @@ std::unordered_map<std::string, int> keyCode = {
 	{"SPACE", VK_SPACE}, {"ENTER", VK_RETURN}
 };
 
+
 int getKeybindFromUser(std::string keybindInputLeftorRight)
 {
 	for (auto& c : keybindInputLeftorRight)
@@ -44,6 +45,8 @@ void PreciseSleep(double millisecond)
 	auto duration = std::chrono::duration<double, std::milli>(millisecond);
 	std::this_thread::sleep_for(duration);
 }
+
+
 void click_mouse(bool is_left)
 {
 	INPUT input = {};
@@ -53,16 +56,39 @@ void click_mouse(bool is_left)
 		MOUSEEVENTF_RIGHTDOWN;
 	SendInput(1, &input, sizeof(INPUT));
 
-	input.mi.dwFlags = is_left ?
-		MOUSEEVENTF_LEFTUP :
-		MOUSEEVENTF_RIGHTUP;
-	SendInput(1, &input, sizeof(INPUT));
+    input.mi.dwFlags = is_left ?
+        MOUSEEVENTF_LEFTUP :
+        MOUSEEVENTF_RIGHTUP;
+    SendInput(1, &input, sizeof(INPUT));
+    /*
+    input.mi.dwFlags = is_left ?
+        MOUSEEVENTF_LEFTDOWN :
+        MOUSEEVENTF_RIGHTDOWN;
+    SendInput(1, &input, sizeof(INPUT));
+
+    input.mi.dwFlags = is_left ?
+        MOUSEEVENTF_LEFTUP :
+        MOUSEEVENTF_RIGHTUP;
+    SendInput(1, &input, sizeof(INPUT));
+    */
 }
+auto lastRightClick = std::chrono::steady_clock::now(); //  Returns a time point representing the current point in time.
 void Autoclicker(float cps, int keybind, bool toggleMode, bool is_left, std::atomic<bool>& isActive)
 {
     bool isPressed = false;  //Tracking keypress
+    const std::chrono::milliseconds rightClickInterval(static_cast<int> (ActualBlockHitDelay) * 1000);
     while (isActived)
     {
+        // trynna implement block hit inside here.
+        auto now = std::chrono::steady_clock::now();
+        bool DoRightClick = false;
+        if (isSmartBlockHit && isLeft)
+        {
+            auto elapsed = now - lastRightClick;
+            DoRightClick = (elapsed >= rightClickInterval);
+        }
+
+    
         if (toggleMode)
         {
             // Handle toggle mode
@@ -80,7 +106,15 @@ void Autoclicker(float cps, int keybind, bool toggleMode, bool is_left, std::ato
             }
             if (isActive)
             {
-                float baseDelay = 1000.0f / cps;
+                // Block hit logicl
+                if (DoRightClick)
+                {
+                    click_mouse(false);
+                    lastRightClick = now;
+                }
+
+                //
+                float baseDelay = 800.0f / cps;
                 float delay = baseDelay + randomOffset(rng);
                 delay = max(10.0f, delay);
                 click_mouse(is_left);
@@ -92,7 +126,15 @@ void Autoclicker(float cps, int keybind, bool toggleMode, bool is_left, std::ato
         {
             if (GetAsyncKeyState(keybind) & 0x8000)
             {
-                float baseDelay = 1000.0f / cps;
+                // Block hit logic
+                if (DoRightClick)
+                {
+                    click_mouse(false);
+                    lastRightClick = now;
+                    PreciseSleep(10);
+                }
+                //
+                float baseDelay = 800.0f / cps;
                 float delay = baseDelay + randomOffset(rng);
                 delay = max(10.0f, delay);
                 click_mouse(is_left);

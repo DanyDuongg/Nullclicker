@@ -238,6 +238,10 @@ void gui::EndRender() noexcept
 	if (result == D3DERR_DEVICELOST && device->TestCooperativeLevel() == D3DERR_DEVICENOTRESET)
 		ResetDevice();
 }
+
+
+
+
 std::thread leftClickerThread;
 std::thread rightClickerThread;
 void gui::Render() noexcept
@@ -245,13 +249,27 @@ void gui::Render() noexcept
 	ImGui::SetNextWindowPos({ 0, 0 });
 	ImGui::SetNextWindowSize({ WIDTH, HEIGHT });
 	ImGui::Begin(
-		"Autoclicker-1337",
+		"NullClicker",
 		&isRunning,
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoMove
 	);
+	// decoration
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.66f, 0.51f, 0.79f,0.15f);
+	style.Colors[ ImGuiCol_Border ] = ImVec4(0.43f, 0.21f, 0.61f, 0.5f);
+	style.Colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+	style.FrameBorderSize= 1.f;
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.66f, 0.51f, 0.79f, 0.2f);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.102f,0.039f,0.141f,1.f);
+	style.WindowTitleAlign = ImVec2(0.5, 0.5);
+	style.Colors[ImGuiCol_Button] = ImVec4(0.66f, 0.51f, 0.79f, 0.2f);
+	style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.102f, 0.039f, 0.141f, 1.f);
+	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.102f, 0.039f, 0.141f, 1.f);
+
+
 	//Handle click options
 	static bool isLeftclick = false;
 	static bool isRightcLick = false;
@@ -266,7 +284,7 @@ void gui::Render() noexcept
 	//Handle keybinds
 	static char bufferKeybindLeft[10];
 	static std::string keybindInputLeft;
-	if (ImGui::InputText("Set left click keybind: ", bufferKeybindLeft,IM_ARRAYSIZE(bufferKeybindLeft)))
+	if (ImGui::InputText("Set left click keybind", bufferKeybindLeft,IM_ARRAYSIZE(bufferKeybindLeft)))
 	{
 		keybindInputLeft = bufferKeybindLeft;
 		Leftkeybind = getKeybindFromUser(keybindInputLeft);
@@ -280,10 +298,22 @@ void gui::Render() noexcept
 		Rightkeybind = getKeybindFromUser(keybindInputRight);
 	}
 	//Handle cps
-	static float Guicps = 15.0f;
-	if (ImGui::SliderFloat("CPS", &Guicps, 1.0f, 50.0f, "%.1f"))
+	static float GuiLeftcps = 15.0f;
+	if (ImGui::SliderFloat("Left CPS", &GuiLeftcps, 1.0f, 50.0f, "%.1f"))
 	{
-		cps = Guicps;
+		Leftcps = GuiLeftcps;
+	}
+
+	static float GuiRightcps = 15.0f;
+	if(ImGui::SliderFloat("Right CPS", &GuiRightcps, 1.0f, 50.0f, "%.1f"))
+	{
+		Rightcps = GuiRightcps;
+	}
+
+	static float blockHitDelay = 3.0f;
+	if (ImGui::SliderFloat("Block hit delay", &blockHitDelay, 0.2f, 5.0f, "%.1f"))
+	{
+		ActualBlockHitDelay = blockHitDelay;
 	}
 
 	//Handle holding/toggle
@@ -291,6 +321,8 @@ void gui::Render() noexcept
 	static bool leftHold = false;
 	static bool rightToggle = false;
 	static bool leftToggle = false;
+	static bool guiIsBlockHit = false;
+
 	if (ImGui::Checkbox("Left hold",&leftHold))
 	{
 		leftToggle = false;
@@ -310,15 +342,25 @@ void gui::Render() noexcept
 		rightHold = false;
 	}
 	
+	if (ImGui::Checkbox("Smart blockhit",&guiIsBlockHit))
+	{
+		isSmartBlockHit.store(guiIsBlockHit);
+	}
+
+	
+
 	//button
 	if (ImGui::Button("Apply"))
 	{
+		
 		if (isActived) 
 		{
 			isActived = false;
 			if (leftClickerThread.joinable()) leftClickerThread.join();
 			if (rightClickerThread.joinable()) rightClickerThread.join();
+
 		}
+		
 		else
 		{
 			isActived = true;
@@ -326,11 +368,11 @@ void gui::Render() noexcept
 			{
 				if (leftHold)
 				{
-					leftClickerThread = std::thread(Autoclicker, cps, Leftkeybind, false, true, std::ref(isHoldingleft));  // Pass 'false' for toggle mode (hold mode)
+					leftClickerThread = std::thread(Autoclicker, Leftcps, Leftkeybind, false, true, std::ref(isHoldingleft));  // Pass 'false' for toggle mode (hold mode)
 				}
 				else if (leftToggle)
 				{
-					leftClickerThread = std::thread(Autoclicker, cps, Leftkeybind, true, true, std::ref(isHoldingleft));  // Pass 'true' for toggle mode
+					leftClickerThread = std::thread(Autoclicker, Leftcps, Leftkeybind, true, true, std::ref(isHoldingleft));  // Pass 'true' for toggle mode
 				}
 			}
 
@@ -339,12 +381,12 @@ void gui::Render() noexcept
 				if (rightHold)
 				{
 					//hold mode
-					rightClickerThread = std::thread(Autoclicker, cps, Rightkeybind, false, false, std::ref(isHoldingright));  // Pass 'false' for toggle mode (hold mode)
+					rightClickerThread = std::thread(Autoclicker, Rightcps, Rightkeybind, false, false, std::ref(isHoldingright));  // Pass 'false' for toggle mode (hold mode)
 				}
 				else if (rightToggle)
 				{
 					//toggle mode
-					rightClickerThread = std::thread(Autoclicker, cps, Rightkeybind, true, false, std::ref(isHoldingright));  // Pass 'true' for toggle mode
+					rightClickerThread = std::thread(Autoclicker, Rightcps, Rightkeybind, true, false, std::ref(isHoldingright));  // Pass 'true' for toggle mode
 				}
 			}
 		}
