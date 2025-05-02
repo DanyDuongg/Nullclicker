@@ -1,4 +1,12 @@
 # Nullclicker
+UPDATE:
+
+- Better Ui
+
+- Smart Block Hit (for old mc version (1.7,1.8.9,...,etc)
+
+- Much better cps handling
+  
 🚀 AutoClicker with Smart Randomization
 AutoClicker Icon
 
@@ -45,6 +53,6 @@ MIT License – Free for personal and commercial use.
 
 **NOTE**
 
-If you want your cps correct, just subtract 5-6 cps in the gui/setting.  
+If you want your cps correct, just subtract 1-2 cps in the gui/setting.  
 
-For example: 22 cps in config but 16-17 cps in game.
+For example: 18 cps in config but 16-17 cps in game.
